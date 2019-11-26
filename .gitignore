@@ -19,3 +19,10 @@ build/
 # Other
 .vscode/
 dist/
+
+
+/.build
+/release
+/debug
+/excons.cache
+/*.dblite
