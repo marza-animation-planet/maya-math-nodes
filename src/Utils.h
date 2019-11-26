@@ -8,6 +8,7 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include <maya/MAngle.h>
 #include <maya/MArrayDataBuilder.h>
