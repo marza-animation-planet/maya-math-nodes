@@ -1,12 +1,12 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __Utils_h__
+#define __Utils_h__
 
 #include <algorithm>
 #include <cmath>
 #include <limits>
 #include <string>
-#include <type_traits>
 #include <vector>
 
 #include <maya/MAngle.h>
@@ -25,11 +25,58 @@
 #include <maya/MVector.h>
 #include <maya/MQuaternion.h>
 
+
+
+
+#if __cplusplus <= 199711L
+
+#define TEMPLATE_PARAMETER_LINKAGE extern const
+
+namespace std
+{
+    template <typename T> struct is_pod { static const bool value = false; };
+    template <> struct is_pod<bool> { static const bool value = true; };
+    template <> struct is_pod<char> { static const bool value = true; };
+    template <> struct is_pod<unsigned char> { static const bool value = true; };
+    template <> struct is_pod<short> { static const bool value = true; };
+    template <> struct is_pod<unsigned short> { static const bool value = true; };
+    template <> struct is_pod<int> { static const bool value = true; };
+    template <> struct is_pod<unsigned int> { static const bool value = true; };
+    template <> struct is_pod<long> { static const bool value = true; };
+    template <> struct is_pod<unsigned long> { static const bool value = true; };
+    template <> struct is_pod<float> { static const bool value = true; };
+    template <> struct is_pod<double> { static const bool value = true; };
+    
+    template <bool Condition, typename Type> struct enable_if { typedef Type type; };
+    template <typename Type> struct enable_if<false, Type> { };
+
+    template <typename Type> Type round(Type arg) { return Type(::round(double(arg))); }
+    /*
+    template <typename Type> Type floor(Type arg) { return Type(::floor(double(arg))); }
+    template <typename Type> Type ceil(Type arg) { return Type(::ceil(double(arg))); }
+    template <typename Type> Type pow(Type arg) { return Type(::pow(double(arg))); }
+    template <typename Type> Type exp(Type arg) { return Type(::exp(double(arg))); }
+    template <typename Type> Type abs(Type arg) { return Type(::fabs(double(arg))); }
+    template <typename Type> Type log(Type arg) { return Type(::log(double(arg))); }
+    template <typename Type> Type cos(Type arg) { return Type(::cos(double(arg))); }
+    template <typename Type> Type sin(Type arg) { return Type(::sin(double(arg))); }
+    template <typename Type> Type tan(Type arg) { return Type(::tan(double(arg))); }
+    template <typename Type> Type acos(Type arg) { return Type(::acos(double(arg))); }
+    template <typename Type> Type asin(Type arg) { return Type(::asin(double(arg))); }
+    template <typename Type> Type atan(Type arg) { return Type(::atan(double(arg))); }
+    */
+}
+
+#else
+
 #ifdef __APPLE__
     #define TEMPLATE_PARAMETER_LINKAGE constexpr
 #else
     #define TEMPLATE_PARAMETER_LINKAGE extern const
 #endif
+
+#endif
+
 
 struct Attribute
 {
@@ -287,9 +334,10 @@ inline void createCompoundAttribute(Attribute& attr, const std::vector<Attribute
     MFnCompoundAttribute cAttrFn;
     attr.attr = cAttrFn.create(name, name);
     
-    for (const Attribute& child : children)
+    for (std::vector<Attribute>::const_iterator child = children.begin();
+         child != children.end(); ++child)
     {
-        cAttrFn.addChild(child);
+        cAttrFn.addChild(*child);
     }
     
     cAttrFn.setKeyable(isInput);
@@ -717,10 +765,11 @@ inline void setAttribute(MDataBlock& dataBlock, const Attribute& attribute, cons
     MArrayDataHandle handle = dataBlock.outputArrayValue(attribute);
     MArrayDataBuilder builder(attribute, unsigned(values.size()));
     
-    for (const auto& value : values)
+    for (typename std::vector<TType>::const_iterator value = values.begin();
+         value != values.end(); ++value)
     {
         MDataHandle itemHandle = builder.addLast();
-        itemHandle.set(value);
+        itemHandle.set(*value);
     }
     
     handle.set(builder);
@@ -795,12 +844,17 @@ template<typename TClass, const char* TTypeName>
 class BaseNode : public MPxNode
 {
 public:
+    static void* create()
+    {
+        return new TClass();
+    }
+
     static void registerNode(class MFnPlugin& pluginFn, int typeId)
     {
         kTypeId = typeId;
         pluginFn.registerNode((std::string(NODE_NAME_PREFIX) + TTypeName).c_str(),
                               typeId,
-                              []() -> void* { return new TClass(); },
+                              BaseNode<TClass, TTypeName>::create,
                               TClass::initialize);
     }
     
@@ -809,9 +863,9 @@ public:
         pluginFn.deregisterNode(kTypeId);
     }
     
-    SchedulingType schedulingType() const override
+    virtual SchedulingType schedulingType() const
     {
-        return SchedulingType::kParallel;
+        return MPxNode::kParallel;
     }
 
 protected:
@@ -820,3 +874,5 @@ protected:
 
 template<typename TClass, const char* TTypeName>
 int BaseNode<TClass, TTypeName>::kTypeId = -1;
+
+#endif

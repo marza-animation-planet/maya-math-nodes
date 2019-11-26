@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __Trig_h__
+#define __Trig_h__
 
 #include "Utils.h"
 
@@ -57,11 +58,11 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_)
         {
-            const auto inputValue = getAttribute<TInputAttrType>(dataBlock, inputAttr_);
+            const TInputAttrType inputValue = getAttribute<TInputAttrType>(dataBlock, inputAttr_);
             
             setAttribute(dataBlock, outputAttr_, TTrigFuncPtr(inputValue));
             
@@ -107,12 +108,12 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_)
         {
-            const auto input1Value = getAttribute<double>(dataBlock, input1Attr_);
-            const auto input2Value = getAttribute<double>(dataBlock, input2Attr_);
+            const double input1Value = getAttribute<double>(dataBlock, input1Attr_);
+            const double input2Value = getAttribute<double>(dataBlock, input2Attr_);
             
             if (input1Value == 0 && input2Value == 0)
             {
@@ -137,3 +138,5 @@ private:
 Attribute Atan2::input1Attr_;
 Attribute Atan2::input2Attr_;
 Attribute Atan2::outputAttr_;
+
+#endif

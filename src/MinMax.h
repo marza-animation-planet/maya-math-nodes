@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __MinMax_h__
+#define __MinMax_h__
 
 #include "Utils.h"
 
@@ -42,12 +43,12 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto input1Value = getAttribute<TAttrType>(dataBlock, input1Attr_);
-            const auto input2Value = getAttribute<TAttrType>(dataBlock, input2Attr_);
+            const TAttrType input1Value = getAttribute<TAttrType>(dataBlock, input1Attr_);
+            const TAttrType input2Value = getAttribute<TAttrType>(dataBlock, input2Attr_);
             
             setAttribute(dataBlock, outputAttr_, TOpFuncPtr(input1Value, input2Value));
             
@@ -85,3 +86,5 @@ MIN_MAX_NODE(int, MaxInt, &std::max);
 MIN_MAX_NODE(int, MinInt, &std::min);
 MIN_MAX_NODE(MAngle, MaxAngle, &std::max);
 MIN_MAX_NODE(MAngle, MinAngle, &std::min);
+
+#endif

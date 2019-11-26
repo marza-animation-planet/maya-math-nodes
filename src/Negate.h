@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __Negate_h__
+#define __Negate_h__
 
 #include "Utils.h"
 
@@ -39,11 +40,11 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_)
         {
-            const auto inputValue = getAttribute<typename TOperator::argument_type>(dataBlock, inputAttr_);
+            const typename TOperator::argument_type inputValue = getAttribute<typename TOperator::argument_type>(dataBlock, inputAttr_);
             
             setAttribute(dataBlock, outputAttr_, TOperator()(inputValue));
             
@@ -53,7 +54,7 @@ public:
         return MS::kUnknownParameter;
     }
     
-    MPlug passThroughToOne(const MPlug& plug) const override
+    MPlug passThroughToOne(const MPlug& plug) const
     {
         if (plug == inputAttr_)
         {
@@ -83,3 +84,5 @@ NEGATE_NODE(NegateInt, negate_fob<int>);
 NEGATE_NODE(NegateAngle, negate_fob<MAngle>);
 NEGATE_NODE(NegateVector, negate_fob<MVector>);
 NEGATE_NODE(NotBool, negate_bool_fob);
+
+#endif

@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __VectorOps_h__
+#define __VectorOps_h__
 
 #include "Utils.h"
 
@@ -36,12 +37,12 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto input1Value = getAttribute<MVector>(dataBlock, input1Attr_);
-            const auto input2Value = getAttribute<MVector>(dataBlock, input2Attr_);
+            const MVector input1Value = getAttribute<MVector>(dataBlock, input1Attr_);
+            const MVector input2Value = getAttribute<MVector>(dataBlock, input2Attr_);
             
             setAttribute(dataBlock, outputAttr_, TOutAttrType((input1Value.*TOpFucPtr)(input2Value)));
             
@@ -92,11 +93,11 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto inputValue = static_cast<MVectorExt>(getAttribute<MVector>(dataBlock, input1ttr_));
+            const MVectorExt inputValue = static_cast<MVectorExt>(getAttribute<MVector>(dataBlock, input1ttr_));
             
             setAttribute(dataBlock, outputAttr_, TOutAttrType((inputValue.*TOpFucPtr)()));
             
@@ -124,3 +125,5 @@ Attribute VectorOpNode<TOutAttrType, TClass, TTypeName, TOpFuncType, TOpFucPtr>:
 VECTOR_OP_NODE(double, VectorLength, double (MVector::*)() const, &MVector::length);
 VECTOR_OP_NODE(double, VectorLengthSquared, double (MVectorExt::*)() const, &MVectorExt::vectorLengthSquared);
 VECTOR_OP_NODE(MVector, NormalizeVector, MVector (MVector::*)() const, &MVector::normal);
+
+#endif

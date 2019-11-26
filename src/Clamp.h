@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __Clamp_h__
+#define __Clamp_h__
 
 #include <algorithm>
 #include <cmath>
@@ -31,7 +32,7 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
@@ -47,7 +48,7 @@ public:
         return MS::kUnknownParameter;
     }
     
-    MPlug passThroughToOne(const MPlug& plug) const override
+    MPlug passThroughToOne(const MPlug& plug) const
     {
         if (plug == inputAttr_)
         {
@@ -92,7 +93,7 @@ inline TType remapValue(const TType& value,
                         const TType& low2,
                         const TType& high2)
 {
-    const auto divisor = (high1 - low1);
+    const TType divisor = (high1 - low1);
     if (almostEquals(divisor, TType(0.0))) return TType(0);
     
     return low2 + (high2 - low2) * ((value - low1) / divisor);
@@ -142,7 +143,7 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
@@ -161,7 +162,7 @@ public:
         return MS::kUnknownParameter;
     }
     
-    MPlug passThroughToOne(const MPlug& plug) const override
+    MPlug passThroughToOne(const MPlug& plug) const
     {
         if (plug == inputAttr_)
         {
@@ -224,11 +225,11 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            auto inputValue = getAttribute<double>(dataBlock, inputAttr_);
+            double inputValue = getAttribute<double>(dataBlock, inputAttr_);
             inputValue = std::max(0.0, std::min(inputValue, 1.0));
             
             setAttribute(dataBlock, outputAttr_, inputValue * inputValue * (3 - 2 * inputValue));
@@ -239,7 +240,7 @@ public:
         return MS::kUnknownParameter;
     }
     
-    MPlug passThroughToOne(const MPlug& plug) const override
+    MPlug passThroughToOne(const MPlug& plug) const
     {
         if (plug == inputAttr_)
         {
@@ -256,3 +257,5 @@ private:
 
 Attribute Smoothstep::inputAttr_;
 Attribute Smoothstep::outputAttr_;
+
+#endif

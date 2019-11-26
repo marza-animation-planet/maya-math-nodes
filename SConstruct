@@ -18,7 +18,7 @@ projs = [
       "defs": ["NODE_NAME_PREFIX=\\\"%s\\\"" % nameprefix,
                "PROJECT_VERSION=\\\"%s\\\"" % version],
       "incdirs": ["src"],
-      "srcs": excons.glob("src/*.cpp"),
+      "srcs": ["src/Plugin.cpp"],
       "custom": [maya.Require],
       "install": {"maya/python": ["python/maya_math_nodes"]}
    }

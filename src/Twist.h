@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __Twist_h__
+#define __Twist_h__
 
 #include <maya/MFnEnumAttribute.h>
 #include <maya/MTransformationMatrix.h>
@@ -37,19 +38,19 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto inputValue = getAttribute<TInAttrType>(dataBlock, inputAttr_);
+            const TInAttrType inputValue = getAttribute<TInAttrType>(dataBlock, inputAttr_);
             
             MDataHandle rotOrderHandle = dataBlock.inputValue(rotationOrderAttr_);
-            const auto rotationOrder = MEulerRotation::RotationOrder(rotOrderHandle.asShort());
+            const MEulerRotation::RotationOrder rotationOrder = MEulerRotation::RotationOrder(rotOrderHandle.asShort());
             
             MDataHandle axisHandle = dataBlock.inputValue(axisAttr_);
-            const auto axis = axisHandle.asShort();
+            const short axis = axisHandle.asShort();
             
-            auto quaternion = getRotation<TInAttrType, MQuaternion>(inputValue, rotationOrder);
+            MQuaternion quaternion = getRotation<TInAttrType, MQuaternion>(inputValue, rotationOrder);
             
             double angle = 0.0;
             switch (axis)
@@ -112,3 +113,5 @@ Attribute GetTwistNode<TInAttrType, TClass, TTypeName>::outputAttr_;
 
 GET_TWIST_NODE(MEulerRotation, TwistFromRotation);
 GET_TWIST_NODE(MMatrix, TwistFromMatrix);
+
+#endif

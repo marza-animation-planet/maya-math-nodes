@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __Multiply_h__
+#define __Multiply_h__
 
 #include "Utils.h"
 
@@ -24,12 +25,12 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto input1Value = getAttribute<TInOutAttrType>(dataBlock, input1Attr_);
-            const auto input2Value = getAttribute<TInAttrType>(dataBlock, input2Attr_);
+            const TInOutAttrType input1Value = getAttribute<TInOutAttrType>(dataBlock, input1Attr_);
+            const TInAttrType input2Value = getAttribute<TInAttrType>(dataBlock, input2Attr_);
             
             setAttribute(dataBlock, outputAttr_, TInOutAttrType(input1Value * input2Value));
             
@@ -39,7 +40,7 @@ public:
         return MS::kUnknownParameter;
     }
     
-    MPlug passThroughToOne(const MPlug& plug) const override
+    MPlug passThroughToOne(const MPlug& plug) const
     {
         if (plug == input1Attr_)
         {
@@ -78,3 +79,5 @@ MULTIPLY_NODE(MVector, double, MultiplyVector);
 MULTIPLY_NODE(MVector, MMatrix, MultiplyVectorByMatrix);
 MULTIPLY_NODE(MQuaternion, MQuaternion, MultiplyQuaternion);
 MULTIPLY_NODE(MEulerRotation, double, MultiplyRotation);
+
+#endif

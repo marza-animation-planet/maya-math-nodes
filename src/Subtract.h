@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __Subtract_h__
+#define __Subtract_h__
 
 #include "Utils.h"
 
@@ -24,7 +25,7 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
@@ -39,7 +40,7 @@ public:
         return MS::kUnknownParameter;
     }
     
-    MPlug passThroughToOne(const MPlug& plug) const override
+    MPlug passThroughToOne(const MPlug& plug) const
     {
         if (plug == input1Attr_)
         {
@@ -72,3 +73,5 @@ SUBTRACT_NODE(double, double, Subtract);
 SUBTRACT_NODE(int, int, SubtractInt);
 SUBTRACT_NODE(MAngle, MAngle, SubtractAngle);
 SUBTRACT_NODE(MVector, MVector, SubtractVector);
+
+#endif

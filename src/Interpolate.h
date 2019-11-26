@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __Interpolate_h__
+#define __Interpolate_h__
 
 #include <maya/MFnEnumAttribute.h>
 #include <maya/MTransformationMatrix.h>
@@ -75,13 +76,13 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto input1Value = getAttribute<TAttrType>(dataBlock, input1Attr_);
-            const auto input2Value = getAttribute<TAttrType>(dataBlock, input2Attr_);
-            const auto alphaValue = getAttribute<double>(dataBlock, alphaAttr_);
+            const TAttrType input1Value = getAttribute<TAttrType>(dataBlock, input1Attr_);
+            const TAttrType input2Value = getAttribute<TAttrType>(dataBlock, input2Attr_);
+            const double alphaValue = getAttribute<double>(dataBlock, alphaAttr_);
             
             setAttribute(dataBlock, outputAttr_, lerp(input1Value, input2Value, alphaValue));
             
@@ -154,16 +155,16 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto input1Value = getAttribute<MQuaternion>(dataBlock, input1Attr_);
-            const auto input2Value = getAttribute<MQuaternion>(dataBlock, input2Attr_);
-            const auto alphaValue = getAttribute<double>(dataBlock, alphaAttr_);
+            const MQuaternion input1Value = getAttribute<MQuaternion>(dataBlock, input1Attr_);
+            const MQuaternion input2Value = getAttribute<MQuaternion>(dataBlock, input2Attr_);
+            const double alphaValue = getAttribute<double>(dataBlock, alphaAttr_);
             
             MDataHandle interpTypeHandle = dataBlock.inputValue(interpTypeAttr_);
-            const auto interpType = interpTypeHandle.asShort() * -1;
+            const short interpType = interpTypeHandle.asShort() * -1;
             
             setAttribute(dataBlock, outputAttr_, slerp(input1Value, input2Value, alphaValue, interpType));
             
@@ -201,3 +202,5 @@ Attribute SlerpNode<TClass, TTypeName>::outputAttr_;
     class NodeName : public SlerpNode<NodeName, name##NodeName> {};
 
 SLERP_NODE(SlerpQuaternion);
+
+#endif

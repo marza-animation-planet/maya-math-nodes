@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __Debug_h__
+#define __Debug_h__
 
 #include "Utils.h"
 
@@ -43,9 +44,9 @@ logToConsole(const MString& name, const MQuaternion& value)
 static inline void
 logToConsole(const MString& name, const MMatrix& value)
 {
-    auto data = name + ":\n(";
+    MString data = name + ":\n(";
     
-    for (auto i = 0u; i < 4; ++i)
+    for (unsigned int i = 0u; i < 4; ++i)
     {
         if (i != 0)
         {
@@ -84,11 +85,11 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto inputValue = getAttribute<TAttrType>(dataBlock, inputAttr_);
+            const TAttrType inputValue = getAttribute<TAttrType>(dataBlock, inputAttr_);
             setAttribute(dataBlock, outputAttr_, inputValue);
             
             logToConsole(this->name(), inputValue);
@@ -99,7 +100,7 @@ public:
         return MS::kUnknownParameter;
     }
     
-    MPlug passThroughToOne(const MPlug& plug) const override
+    MPlug passThroughToOne(const MPlug& plug) const
     {
         if (plug == inputAttr_)
         {
@@ -131,3 +132,5 @@ DEBUG_LOG_NODE(MVector, DebugLogVector);
 DEBUG_LOG_NODE(MEulerRotation, DebugLogRotation);
 DEBUG_LOG_NODE(MQuaternion, DebugLogQuaternion);
 DEBUG_LOG_NODE(MMatrix, DebugLogMatrix);
+
+#endif

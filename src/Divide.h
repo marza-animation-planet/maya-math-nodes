@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __Divide_h__
+#define __Divide_h__
 
 #include "Utils.h"
 
@@ -45,12 +46,12 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_)
         {
-            const auto input1Value = getAttribute<typename TOperator::first_argument_type>(dataBlock, input1Attr_);
-            const auto input2Value = getAttribute<typename TOperator::second_argument_type>(dataBlock, input2Attr_);
+            const typename TOperator::first_argument_type input1Value = getAttribute<typename TOperator::first_argument_type>(dataBlock, input1Attr_);
+            const typename TOperator::second_argument_type input2Value = getAttribute<typename TOperator::second_argument_type>(dataBlock, input2Attr_);
             
             if (input2Value == 0)
             {
@@ -66,7 +67,7 @@ public:
         return MS::kUnknownParameter;
     }
     
-    MPlug passThroughToOne(const MPlug& plug) const override
+    MPlug passThroughToOne(const MPlug& plug) const
     {
         if (plug == input1Attr_)
         {
@@ -101,3 +102,5 @@ DIVIDE_NODE(DivideByInt, divides_fob<double COMMA int> );
 DIVIDE_NODE(DivideAngle, divides_fob<MAngle COMMA double>);
 DIVIDE_NODE(DivideAngleByInt, divides_fob<MAngle COMMA int>);
 DIVIDE_NODE(ModulusInt, modulus_fob<int COMMA int>);
+
+#endif

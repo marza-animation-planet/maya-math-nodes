@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __Power_h__
+#define __Power_h__
 
 #include "Utils.h"
 
@@ -24,12 +25,12 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_)
         {
-            const auto inputValue = getAttribute<double>(dataBlock, inputAttr_);
-            const auto exponentValue = getAttribute<double>(dataBlock, exponentAttr_);
+            const double inputValue = getAttribute<double>(dataBlock, inputAttr_);
+            const double exponentValue = getAttribute<double>(dataBlock, exponentAttr_);
             
             setAttribute(dataBlock, outputAttr_, std::pow(inputValue, exponentValue));
             
@@ -39,7 +40,7 @@ public:
         return MS::kUnknownParameter;
     }
     
-    MPlug passThroughToOne(const MPlug& plug) const override
+    MPlug passThroughToOne(const MPlug& plug) const
     {
         if (plug == inputAttr_)
         {
@@ -88,11 +89,11 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_)
         {
-            const auto inputValue = getAttribute<double>(dataBlock, inputAttr_);
+            const double inputValue = getAttribute<double>(dataBlock, inputAttr_);
             
             setAttribute(dataBlock, outputAttr_, std::sqrt(inputValue));
             
@@ -102,7 +103,7 @@ public:
         return MS::kUnknownParameter;
     }
     
-    MPlug passThroughToOne(const MPlug& plug) const override
+    MPlug passThroughToOne(const MPlug& plug) const
     {
         if (plug == inputAttr_)
         {
@@ -128,3 +129,5 @@ Attribute SquareRootNode<TClass, TTypeName>::outputAttr_;
     class NodeName : public SquareRootNode<NodeName, name##NodeName> {};
 
 SQUARE_ROOT_NODE(SquareRoot);
+
+#endif

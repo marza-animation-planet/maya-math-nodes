@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __Round_h__
+#define __Round_h__
 
 #include "Utils.h"
 
@@ -79,11 +80,11 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto inputValue = getAttribute<TAttrType>(dataBlock, inputAttr_);
+            const TAttrType inputValue = getAttribute<TAttrType>(dataBlock, inputAttr_);
             
             setAttribute(dataBlock, outputAttr_, TAttrType((*TOpFucPtr)(inputValue)));
             
@@ -93,7 +94,7 @@ public:
         return MS::kUnknownParameter;
     }
     
-    MPlug passThroughToOne(const MPlug& plug) const override
+    MPlug passThroughToOne(const MPlug& plug) const
     {
         if (plug == inputAttr_)
         {
@@ -124,3 +125,5 @@ ROUND_NODE(double, Floor, double (*)(double), &std_ext::floor_t);
 ROUND_NODE(MAngle, FloorAngle, MAngle (*)(const MAngle&), &std_ext::floor_t);
 ROUND_NODE(double, Round, double (*)(double), &std_ext::round_t);
 ROUND_NODE(MAngle, RoundAngle, MAngle (*)(const MAngle&), &std_ext::round_t);
+
+#endif

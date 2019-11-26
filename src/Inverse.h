@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __Inverse_h__
+#define __Inverse_h__
 
 #include "Utils.h"
 
@@ -21,11 +22,11 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto inputValue = getAttribute<TAttrType>(dataBlock, inputAttr_);
+            const TAttrType inputValue = getAttribute<TAttrType>(dataBlock, inputAttr_);
             
             setAttribute(dataBlock, outputAttr_, inputValue.inverse());
             
@@ -35,7 +36,7 @@ public:
         return MS::kUnknownParameter;
     }
     
-    MPlug passThroughToOne(const MPlug& plug) const override
+    MPlug passThroughToOne(const MPlug& plug) const
     {
         if (plug == inputAttr_)
         {
@@ -63,3 +64,5 @@ Attribute InverseNode<TAttrType, TClass, TTypeName>::outputAttr_;
 INVERSE_NODE(MMatrix, InverseMatrix);
 INVERSE_NODE(MQuaternion, InverseQuaternion);
 INVERSE_NODE(MEulerRotation, InverseRotation);
+
+#endif

@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __Absolute_h__
+#define __Absolute_h__
 
 #include "Utils.h"
 
@@ -43,11 +44,11 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_)
         {
-            const auto inputAttrValue = getAttribute<TAttrType>(dataBlock, inputAttr_);
+            const TAttrType inputAttrValue = getAttribute<TAttrType>(dataBlock, inputAttr_);
             
             setAttribute(dataBlock, outputAttr_, std_ext::abs_t(inputAttrValue));
             
@@ -57,7 +58,7 @@ public:
         return MS::kUnknownParameter;
     }
     
-    MPlug passThroughToOne(const MPlug& plug) const override
+    MPlug passThroughToOne(const MPlug& plug) const
     {
         if (plug == inputAttr_)
         {
@@ -85,3 +86,5 @@ Attribute AbsoluteNode<TAttrType, TClass, TTypeName>::outputAttr_;
 ABSOLUTE_NODE(double, Absolute);
 ABSOLUTE_NODE(int, AbsoluteInt);
 ABSOLUTE_NODE(MAngle, AbsoluteAngle);
+
+#endif

@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __Convert_h__
+#define __Convert_h__
 
 #include <maya/MFnEnumAttribute.h>
 #include <maya/MTransformationMatrix.h>
@@ -73,16 +74,16 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto inputValue = getAttribute<TInAttrType>(dataBlock, inputAttr_);
+            const TInAttrType inputValue = getAttribute<TInAttrType>(dataBlock, inputAttr_);
             
             MDataHandle rotOrderHandle = dataBlock.inputValue(rotationOrderAttr_);
-            const auto rotationOrder = MEulerRotation::RotationOrder(rotOrderHandle.asShort());
+            const MEulerRotation::RotationOrder rotationOrder = MEulerRotation::RotationOrder(rotOrderHandle.asShort());
             
-            const auto rotation = getRotation<TInAttrType, TOutAttrType>(inputValue, rotationOrder);
+            const TOutAttrType rotation = getRotation<TInAttrType, TOutAttrType>(inputValue, rotationOrder);
             setAttribute(dataBlock, outputAttr_, rotation);
             
             return MS::kSuccess;
@@ -127,7 +128,7 @@ inline MVector getScaleFromMatrix(const MMatrix& matrix)
 {
     MTransformationMatrix xform(matrix);
     
-    double3 scale {1.0, 1.0, 1.0};
+    double3 scale = {1.0, 1.0, 1.0};
     xform.getScale(scale, MSpace::kTransform);
     
     return MVector(scale);
@@ -150,11 +151,11 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto inputValue = getAttribute<MMatrix>(dataBlock, inputAttr_);
+            const MMatrix inputValue = getAttribute<MMatrix>(dataBlock, inputAttr_);
             
             setAttribute(dataBlock, outputAttr_, (*TOpFucPtr)(inputValue));
             
@@ -210,24 +211,24 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto translationValue = getAttribute<MVector>(dataBlock, translationAttr_);
-            auto rotationValue = getAttribute<MEulerRotation>(dataBlock, rotationAttr_);
-            const auto scaleValue = getAttribute<MVector>(dataBlock, scaleAttr_);
+            const MVector translationValue = getAttribute<MVector>(dataBlock, translationAttr_);
+            MEulerRotation rotationValue = getAttribute<MEulerRotation>(dataBlock, rotationAttr_);
+            const MVector scaleValue = getAttribute<MVector>(dataBlock, scaleAttr_);
             
             MDataHandle rotOrderHandle = dataBlock.inputValue(rotationOrderAttr_);
-            const auto rotationOrder = MTransformationMatrix::RotationOrder(rotOrderHandle.asShort());
+            const MTransformationMatrix::RotationOrder rotationOrder = MTransformationMatrix::RotationOrder(rotOrderHandle.asShort());
             
             MTransformationMatrix xform;
             xform.setTranslation(translationValue, MSpace::kTransform);
             
-            double3 rotation {rotationValue.x, rotationValue.y, rotationValue.z};
+            double3 rotation = {rotationValue.x, rotationValue.y, rotationValue.z};
             xform.setRotation(rotation, rotationOrder);
             
-            double3 scale {1.0, 1.0, 1.0};
+            double3 scale = {1.0, 1.0, 1.0};
             scaleValue.get(scale);
             xform.setScale(scale, MSpace::kTransform);
             
@@ -294,14 +295,14 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto inputValue = getAttribute<MMatrix>(dataBlock, inputAttr_);
+            const MMatrix inputValue = getAttribute<MMatrix>(dataBlock, inputAttr_);
     
             MDataHandle axisHandle = dataBlock.inputValue(axisAttr_);
-            const auto axis = axisHandle.asShort();
+            const short axis = axisHandle.asShort();
             
             setAttribute(dataBlock, outputAttr_, MVector(inputValue[axis][0], inputValue[axis][1], inputValue[axis][2]));
             
@@ -364,12 +365,12 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto directionValue = getAttribute<MVector>(dataBlock, directionAttr_).normal();
-            auto upValue = getAttribute<MVector>(dataBlock, upAttr_).normal();
+            const MVector directionValue = getAttribute<MVector>(dataBlock, directionAttr_).normal();
+            MVector upValue = getAttribute<MVector>(dataBlock, upAttr_).normal();
             
             if (directionValue.isParallel(upValue))
             {
@@ -380,9 +381,9 @@ public:
             }
             
             MDataHandle alignmentHandle = dataBlock.inputValue(alignmentAttr_);
-            const auto alignmentValue = alignmentHandle.asShort();
+            const short alignmentValue = alignmentHandle.asShort();
             
-            const auto cross = directionValue ^ upValue;
+            const MVector cross = directionValue ^ upValue;
             upValue = cross ^ directionValue;
             
             double xformData[4][4] = {{1.0, 0.0, 0.0, 0.0},
@@ -438,3 +439,5 @@ Attribute MatrixFromDirection::directionAttr_;
 Attribute MatrixFromDirection::upAttr_;
 Attribute MatrixFromDirection::alignmentAttr_;
 Attribute MatrixFromDirection::outputAttr_;
+
+#endif

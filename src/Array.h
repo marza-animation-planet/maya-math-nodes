@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __Array_h__
+#define __Array_h__
 
 #include <algorithm>
 #include <numeric>
@@ -8,12 +9,17 @@
 #include "Utils.h"
 
 template<typename TType>
+inline TType sum2(const TType &a, const TType &b)
+{
+    return (a + b);
+}
+
+template<typename TType>
 inline TType sum(const std::vector<TType>& values)
 {
     if (values.empty()) return DefaultValue<TType>();
     
-    return std::accumulate(values.begin(), values.end(), DefaultValue<TType>(),
-                           [](const TType& a, const TType& b){ return a + b; });
+    return std::accumulate(values.begin(), values.end(), DefaultValue<TType>(), sum2<TType>);
 }
 
 template<typename TInType, typename TOutType>
@@ -21,8 +27,7 @@ inline TOutType average(const std::vector<TInType>& values)
 {
     if (values.empty()) return DefaultValue<TOutType>();
     
-    TInType sum = std::accumulate(values.begin(), values.end(), DefaultValue<TInType>(),
-                                  [](const TInType& a, const TInType& b){ return a + b; });
+    TInType sum = std::accumulate(values.begin(), values.end(), DefaultValue<TInType>(), sum2<TInType>);
     return TOutType(sum / int(values.size()));
 }
 
@@ -34,7 +39,7 @@ inline TOutType average(const std::vector<TInType>& values, const std::vector<do
     const double weightSum = std::accumulate(weights.begin(), weights.end(), 0.0);
     if (almostEquals(weightSum, 0.0)) return DefaultValue<TOutType>();
     
-    auto sum = DefaultValue<TInType>();
+    TInType sum = DefaultValue<TInType>();
     for (unsigned i = 0u; i < values.size(); ++i)
     {
         sum = sum + values[i] * weights[i];
@@ -75,12 +80,13 @@ inline MEulerRotation average(const std::vector<MEulerRotation>& values)
     if (values.empty()) return MEulerRotation::identity;
     
     MQuaternion sum;
-    for (const auto& rotation : values)
+    for (std::vector<MEulerRotation>::const_iterator rotation = values.begin();
+         rotation != values.end(); ++rotation)
     {
-        sum = sum + rotation.asQuaternion().log();
+        sum = sum + rotation->asQuaternion().log();
     }
     
-    const auto count = values.size();
+    const size_t count = values.size();
     const MQuaternion average(sum.x / count, sum.y / count, sum.z / count, sum.w / count);
     
     return average.exp().asEulerRotation();
@@ -111,12 +117,13 @@ inline MQuaternion average(const std::vector<MQuaternion>& values)
     if (values.empty()) return MQuaternion::identity;
     
     MQuaternion sum;
-    for (const auto& rotation : values)
+    for (std::vector<MQuaternion>::const_iterator rotation = values.begin();
+         rotation != values.end(); ++rotation)
     {
-        sum = sum + rotation.log();
+        sum = sum + rotation->log();
     }
     
-    const auto count = values.size();
+    const size_t count = values.size();
     const MQuaternion average(sum.x / count, sum.y / count, sum.z / count, sum.w / count);
     
     return average.exp();
@@ -172,8 +179,10 @@ inline MMatrix average(const std::vector<MMatrix>& values)
     MQuaternion rotation;
     MVector position, scale, shear;
     
-    for (const auto& matrix : values) {
-        const MTransformationMatrix xform(matrix);
+    for (std::vector<MMatrix>::const_iterator matrix = values.begin();
+         matrix != values.end(); ++matrix)
+    {
+        const MTransformationMatrix xform(*matrix);
         
         double3 scaleData = {1.0, 1.0, 1.0};
         double3 shearData = {0.0, 0.0, 0.0};
@@ -199,11 +208,11 @@ inline MMatrix average(const std::vector<MMatrix>& values)
         scale += MVector(scaleData);
         shear += MVector(shearData);
         
-        rotation = rotation + MatrixToQuaternion(matrix).log();
+        rotation = rotation + MatrixToQuaternion(*matrix).log();
         position += xform.getTranslation(MSpace::kWorld);
     }
 
-    const auto count = values.size();
+    const size_t count = values.size();
     const MVector scaleAverage = scale / count;
     const MVector shearAverage = shear / count;
     
@@ -218,10 +227,10 @@ inline MMatrix average(const std::vector<MMatrix>& values)
     scaleData[2] = std::exp(scaleData[2]);
     
     const MVector positionAverage = position / count;
-    const auto rotationAverage = MQuaternion(rotation.x / count,
-                                             rotation.y / count,
-                                             rotation.z / count,
-                                             rotation.w / count).exp();
+    const MQuaternion rotationAverage = MQuaternion(rotation.x / count,
+                                                    rotation.y / count,
+                                                    rotation.z / count,
+                                                    rotation.w / count).exp();
     
     MTransformationMatrix xform;
     xform.setScale(scaleData, MSpace::kObject);
@@ -288,10 +297,10 @@ inline MMatrix average(const std::vector<MMatrix>& values, const std::vector<dou
     scaleData[2] = std::exp(scaleData[2]);
     
     const MVector positionAverage = position / weightSum;
-    const auto rotationAverage = MQuaternion(rotation.x / weightSum,
-                                             rotation.y / weightSum,
-                                             rotation.z / weightSum,
-                                             rotation.w / weightSum).exp();
+    const MQuaternion rotationAverage = MQuaternion(rotation.x / weightSum,
+                                                    rotation.y / weightSum,
+                                                    rotation.z / weightSum,
+                                                    rotation.w / weightSum).exp();
     
     MTransformationMatrix xform;
     xform.setScale(scaleData, MSpace::kObject);
@@ -311,9 +320,10 @@ inline std::vector<double> normalize(const std::vector<double>& values)
     if (almostEquals(s, 0.0)) return values;
     
     out.reserve(values.size());
-    for (const auto& value : values)
+    for (std::vector<double>::const_iterator value = values.begin();
+         value != values.end(); ++value)
     {
-        out.push_back(value / s);
+        out.push_back(*value / s);
     }
     
     return out;
@@ -325,9 +335,10 @@ inline std::vector<double> clamp(const std::vector<double>& values)
     if (values.empty()) return out;
     
     out.reserve(values.size());
-    for (const auto& value : values)
+    for (std::vector<double>::const_iterator value = values.begin();
+         value != values.end(); ++value)
     {
-        out.push_back(std::max(0.0, std::min(value, 1.0)));
+        out.push_back(std::max(0.0, std::min(*value, 1.0)));
     }
     
     return out;
@@ -341,9 +352,10 @@ inline std::vector<double> normalizeWeights(const std::vector<double>& values)
     const double s = sum(out);
     if (s < 1.0) return out;
     
-    for (auto& item : out)
+    for (std::vector<double>::iterator item = out.begin();
+         item != out.end(); ++item)
     {
-        item /= s;
+        *item /= s;
     }
     
     return out;
@@ -364,9 +376,10 @@ MAngle min_array_element(const std::vector<MAngle>& values)
     std::vector<double> angleValues;
     angleValues.reserve(values.size());
     
-    for (const auto& value : values)
+    for (std::vector<MAngle>::const_iterator value = values.begin();
+         value != values.end(); ++value)
     {
-        angleValues.push_back(value.asRadians());
+        angleValues.push_back(value->asRadians());
     }
     
     return MAngle(*std::min_element(angleValues.begin(), angleValues.end()));
@@ -387,9 +400,10 @@ MAngle max_array_element(const std::vector<MAngle>& values)
     std::vector<double> angleValues;
     angleValues.reserve(values.size());
     
-    for (const auto& value : values)
+    for (std::vector<MAngle>::const_iterator value = values.begin();
+         value != values.end(); ++value)
     {
-        angleValues.push_back(value.asRadians());
+        angleValues.push_back(value->asRadians());
     }
     
     return MAngle(*std::max_element(angleValues.begin(), angleValues.end()));
@@ -414,11 +428,11 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto inputValue = getAttribute<std::vector<TInAttrType>>(dataBlock, inputAttr_);
+            const std::vector<TInAttrType> inputValue = getAttribute<std::vector<TInAttrType> >(dataBlock, inputAttr_);
             
             setAttribute(dataBlock, outputAttr_, TFuncPtr(inputValue));
             
@@ -476,7 +490,10 @@ public:
     {
         createAttribute(valueAttr_, "value", DefaultValue<TInAttrType>(), true);
         createAttribute(weightAttr_, "weight", 1.0, true);
-        createCompoundAttribute(inputAttr_, {valueAttr_, weightAttr_}, "input", true, true);
+        std::vector<Attribute> children;
+        children.push_back(valueAttr_);
+        children.push_back(weightAttr_);
+        createCompoundAttribute(inputAttr_, children, "input", true, true);
         createAttribute(outputAttr_, "output", DefaultValue<TOutAttrType>(), false);
         
         MPxNode::addAttribute(inputAttr_);
@@ -489,12 +506,12 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto values = getAttribute<std::vector<TInAttrType>>(dataBlock, inputAttr_, valueAttr_);
-            const auto weights = getAttribute<std::vector<double>>(dataBlock, inputAttr_, weightAttr_);
+            const std::vector<TInAttrType> values = getAttribute<std::vector<TInAttrType> >(dataBlock, inputAttr_, valueAttr_);
+            const std::vector<double> weights = getAttribute<std::vector<double> >(dataBlock, inputAttr_, weightAttr_);
             
             setAttribute(dataBlock, outputAttr_, TFuncPtr(values, weights));
             
@@ -559,13 +576,13 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto inputValue = getAttribute<std::vector<TAttrType>>(dataBlock, inputAttr_);
+            const std::vector<TAttrType> inputValues = getAttribute<std::vector<TAttrType> >(dataBlock, inputAttr_);
             
-            setAttribute(dataBlock, outputAttr_, TFuncPtr(inputValue));
+            setAttribute(dataBlock, outputAttr_, TFuncPtr(inputValues));
             
             return MS::kSuccess;
         }
@@ -592,3 +609,5 @@ Attribute ArrayMapOpNode<TAttrType, TClass, TTypeName, TFuncPtr>::outputAttr_;
 
 ARRAY_MAP_OP_NODE(double, NormalizeArray, &normalize);
 ARRAY_MAP_OP_NODE(double, NormalizeWeightsArray, &normalizeWeights);
+
+#endif

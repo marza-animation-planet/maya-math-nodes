@@ -1,6 +1,7 @@
 // Copyright (c) 2018 Serguei Kalentchouk et al. All rights reserved.
 // Use of this source code is governed by an MIT license that can be found in the LICENSE file.
-#pragma once
+#ifndef __Condition_h__
+#define __Condition_h__
 
 #include <algorithm>
 #include <limits>
@@ -39,15 +40,15 @@ public:
         return MS::kSuccess;
     }
 
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto input1Value = getAttribute<TAttrType>(dataBlock, input1Attr_);
-            const auto input2Value = getAttribute<TAttrType>(dataBlock, input2Attr_);
+            const TAttrType input1Value = getAttribute<TAttrType>(dataBlock, input1Attr_);
+            const TAttrType input2Value = getAttribute<TAttrType>(dataBlock, input2Attr_);
 
             MDataHandle operationHandle = dataBlock.inputValue(operationAttr_);
-            const auto operation = operationHandle.asShort();
+            const short operation = operationHandle.asShort();
             
             bool status;
             switch (operation)
@@ -143,13 +144,13 @@ public:
         return MS::kSuccess;
     }
 
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto input1Value = getAttribute<TAttrType>(dataBlock, input1Attr_);
-            const auto input2Value = getAttribute<TAttrType>(dataBlock, input2Attr_);
-            const auto conditionValue = getAttribute<bool>(dataBlock, condition_);
+            const TAttrType input1Value = getAttribute<TAttrType>(dataBlock, input1Attr_);
+            const TAttrType input2Value = getAttribute<TAttrType>(dataBlock, input2Attr_);
+            const bool conditionValue = getAttribute<bool>(dataBlock, condition_);
 
             setAttribute(dataBlock, outputAttr_, conditionValue ? input2Value : input1Value);
 
@@ -214,13 +215,13 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto input1Value = getAttribute<std::vector<TAttrType>>(dataBlock, input1Attr_);
-            const auto input2Value = getAttribute<std::vector<TAttrType>>(dataBlock, input2Attr_);
-            const auto conditionValue = getAttribute<bool>(dataBlock, condition_);
+            const std::vector<TAttrType> input1Value = getAttribute<std::vector<TAttrType> >(dataBlock, input1Attr_);
+            const std::vector<TAttrType> input2Value = getAttribute<std::vector<TAttrType> >(dataBlock, input2Attr_);
+            const bool conditionValue = getAttribute<bool>(dataBlock, condition_);
             
             setAttribute(dataBlock, outputAttr_, conditionValue ? input2Value : input1Value);
             
@@ -299,12 +300,12 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto input1Value = getAttribute<TAttrType>(dataBlock, input1Attr_);
-            const auto input2Value = getAttribute<TAttrType>(dataBlock, input2Attr_);
+            const TAttrType input1Value = getAttribute<TAttrType>(dataBlock, input1Attr_);
+            const TAttrType input2Value = getAttribute<TAttrType>(dataBlock, input2Attr_);
             
             setAttribute(dataBlock, outputAttr_, TFuncPtr(input1Value, input2Value));
             
@@ -373,13 +374,13 @@ public:
         return MS::kSuccess;
     }
     
-    MStatus compute(const MPlug& plug, MDataBlock& dataBlock) override
+    MStatus compute(const MPlug& plug, MDataBlock& dataBlock)
     {
         if (plug == outputAttr_ || (plug.isChild() && plug.parent() == outputAttr_))
         {
-            const auto input1Value = getAttribute(dataBlock, input1Attr_, TGeomType);
-            const auto input2Value = getAttribute(dataBlock, input2Attr_, TGeomType);
-            const auto conditionValue = getAttribute<bool>(dataBlock, condition_);
+            const MObject input1Value = getAttribute(dataBlock, input1Attr_, TGeomType);
+            const MObject input2Value = getAttribute(dataBlock, input2Attr_, TGeomType);
+            const bool conditionValue = getAttribute<bool>(dataBlock, condition_);
             
             setAttribute(dataBlock, outputAttr_, conditionValue ? input2Value : input1Value);
             
@@ -404,3 +405,5 @@ SELECT_GEOM_NODE_ATTRIBUTE::outputAttr_;
 SELECT_GEOM_NODE(SelectCurve, MFnData::kNurbsCurve);
 SELECT_GEOM_NODE(SelectMesh, MFnData::kMesh);
 SELECT_GEOM_NODE(SelectSurface, MFnData::kNurbsSurface);
+
+#endif
