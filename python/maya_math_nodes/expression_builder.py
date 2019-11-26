@@ -5,8 +5,8 @@ import collections
 import maya.api.OpenMaya as om
 import maya.cmds as cmds
 
-from expression_info import *
-from expression_parser import *
+from .expression_info import *
+from .expression_parser import *
 
 Attribute = collections.namedtuple('Attribute', ['type', 'value'])
 

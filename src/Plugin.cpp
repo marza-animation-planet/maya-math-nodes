@@ -22,7 +22,7 @@
 #include "Twist.h"
 #include "VectorOps.h"
 
-MStatus
+PLUGIN_EXPORT MStatus
 initializePlugin(MObject pluginObj)
 {
     MFnPlugin pluginFn(pluginObj, "Serguei Kalentchouk, et al.", PROJECT_VERSION, "Any");
@@ -186,7 +186,7 @@ initializePlugin(MObject pluginObj)
     return MS::kSuccess;
 }
 
-MStatus
+PLUGIN_EXPORT MStatus
 uninitializePlugin(MObject pluginObj)
 {
     MFnPlugin pluginFn(pluginObj);

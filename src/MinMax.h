@@ -79,12 +79,9 @@ Attribute MinMaxNode<TAttrType, TClass, TTypeName, TOpFuncPtr>::outputAttr_;
     TEMPLATE_PARAMETER_LINKAGE char name##NodeName[] = #NodeName; \
     class NodeName : public MinMaxNode<AttrType, NodeName, name##NodeName, OpFuncPtr> {};
 
-#pragma clang diagnostic push
-#pragma ide diagnostic ignored "TemplateArgumentsIssues"
 MIN_MAX_NODE(double, Max, &std::max);
 MIN_MAX_NODE(double, Min, &std::min);
 MIN_MAX_NODE(int, MaxInt, &std::max);
 MIN_MAX_NODE(int, MinInt, &std::min);
 MIN_MAX_NODE(MAngle, MaxAngle, &std::max);
 MIN_MAX_NODE(MAngle, MinAngle, &std::min);
-#pragma clang diagnostic pop

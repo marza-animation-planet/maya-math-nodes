@@ -3,7 +3,7 @@
 import collections
 import functools
 
-from expression_info import *
+from .expression_info import *
 
 BracketToken = 0
 NumberToken = 1
