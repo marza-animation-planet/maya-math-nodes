@@ -33,8 +33,28 @@
 
 #define TEMPLATE_PARAMETER_LINKAGE extern const
 
+#ifdef WIN32
+
+template <typename Type>
+Type copysign(Type arg, Type sign)
+{
+    return (sign < 0 ? (arg < 0 ? arg : -arg) : (arg >= 0 ? arg : -arg));
+}
+
+template <typename Type>
+Type round(Type arg)
+{
+    return arg < 0 ? Type(ceil(double(arg) - 0.5)) : Type(floor(double(arg) + 0.5));
+}
+
+#endif
+
 namespace std
 {
+#if !defined(WIN32) || _MSC_VER < 1700
+    // VisualStudio 2012 (msvc runtime 11.0, _MSC_VER 1700)
+    // even if __cplusplus is defined as <= 199711L implements C++11 to some extent...
+    // the following type traits are defined and would cause a compile error
     template <typename T> struct is_pod { static const bool value = false; };
     template <> struct is_pod<bool> { static const bool value = true; };
     template <> struct is_pod<char> { static const bool value = true; };
@@ -47,9 +67,10 @@ namespace std
     template <> struct is_pod<unsigned long> { static const bool value = true; };
     template <> struct is_pod<float> { static const bool value = true; };
     template <> struct is_pod<double> { static const bool value = true; };
-    
+
     template <bool Condition, typename Type> struct enable_if { typedef Type type; };
     template <typename Type> struct enable_if<false, Type> { };
+#endif
 
     template <typename Type> Type round(Type arg) { return Type(::round(double(arg))); }
     /*

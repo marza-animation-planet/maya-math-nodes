@@ -86,8 +86,8 @@ inline MEulerRotation average(const std::vector<MEulerRotation>& values)
         sum = sum + rotation->asQuaternion().log();
     }
     
-    const size_t count = values.size();
-    const MQuaternion average(sum.x / count, sum.y / count, sum.z / count, sum.w / count);
+    const double invCount = 1.0 / double(values.size());
+    const MQuaternion average(sum.x * invCount, sum.y * invCount, sum.z * invCount, sum.w * invCount);
     
     return average.exp().asEulerRotation();
 }
@@ -123,8 +123,8 @@ inline MQuaternion average(const std::vector<MQuaternion>& values)
         sum = sum + rotation->log();
     }
     
-    const size_t count = values.size();
-    const MQuaternion average(sum.x / count, sum.y / count, sum.z / count, sum.w / count);
+    const double invCount = 1.0 / double(values.size());
+    const MQuaternion average(sum.x * invCount, sum.y * invCount, sum.z * invCount, sum.w * invCount);
     
     return average.exp();
 }
@@ -212,9 +212,9 @@ inline MMatrix average(const std::vector<MMatrix>& values)
         position += xform.getTranslation(MSpace::kWorld);
     }
 
-    const size_t count = values.size();
-    const MVector scaleAverage = scale / count;
-    const MVector shearAverage = shear / count;
+    const double invCount = 1.0 / double(values.size());
+    const MVector scaleAverage = scale * invCount;
+    const MVector shearAverage = shear * invCount;
     
     double3 scaleData = {1.0, 1.0, 1.0};
     double3 shearData = {0.0, 0.0, 0.0};
@@ -226,11 +226,11 @@ inline MMatrix average(const std::vector<MMatrix>& values)
     scaleData[1] = std::exp(scaleData[1]);
     scaleData[2] = std::exp(scaleData[2]);
     
-    const MVector positionAverage = position / count;
-    const MQuaternion rotationAverage = MQuaternion(rotation.x / count,
-                                                    rotation.y / count,
-                                                    rotation.z / count,
-                                                    rotation.w / count).exp();
+    const MVector positionAverage = position * invCount;
+    const MQuaternion rotationAverage = MQuaternion(rotation.x * invCount,
+                                                    rotation.y * invCount,
+                                                    rotation.z * invCount,
+                                                    rotation.w * invCount).exp();
     
     MTransformationMatrix xform;
     xform.setScale(scaleData, MSpace::kObject);
